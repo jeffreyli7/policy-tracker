@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Macau District 上板系統 - 業績綜合管理與即時分析系統</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            purple: '#423A8E',
+                            teal: '#00CCCD',
+                            yellow: '#FFC107',
+                            red: '#DC3545',
+                            green: '#198754',
+                            blue: '#0D6EFD'
+                        },
+                        slate: {
+                            850: '#111827',
+                            950: '#030712',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Custom Brand Utility Classes */
+        .bg-brand-purple { background-color: #423A8E; }
+        .text-brand-purple { color: #423A8E; }
+        .border-brand-purple { border-color: #423A8E; }
+        
+        .bg-brand-teal { background-color: #00CCCD; }
+        .text-brand-teal { color: #00CCCD; }
+        .border-brand-teal { border-color: #00CCCD; }
+
+        .bg-brand-yellow { background-color: #FFC107; }
+        .text-brand-yellow { color: #FFC107; }
+
+        .bg-brand-red { background-color: #DC3545; }
+        .text-brand-red { color: #DC3545; }
+
+        .bg-brand-green { background-color: #198754; }
+        .text-brand-green { color: #198754; }
+
+        .bg-brand-blue { background-color: #0D6EFD; }
+        .text-brand-blue { color: #0D6EFD; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-900 min-h-screen font-sans antialiased selection:bg-[#423A8E] selection:text-white">
+
+    <!-- TOP NAVBAR -->
+    <header class="sticky top-0 z-50 bg-white border-b border-slate-300 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- LOGO / BRANDING -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#423A8E] to-[#00CCCD] p-0.5 shadow-md shadow-[#423A8E]/20">
+                        <div class="w-full h-full bg-white rounded-[10px] flex items-center justify-center">
+                            <i class="fa-solid fa-chart-line text-[#423A8E] text-lg"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="text-base font-extrabold text-slate-950">
+                            Macau District 上板系統
+                        </h1>
+                        <p class="text-[10px] text-slate-700 font-bold tracking-wide">業績綜合管理與即時分析系統</p>
+                    </div>
+                </div>
+
+                <!-- USER CONTROLS -->
+                <div id="userNavControls" class="hidden flex items-center space-x-3">
+                    <div id="userInfoBadge" class="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-slate-200 border border-slate-300 text-xs">
+                        <span class="w-2.5 h-2.5 rounded-full bg-[#198754] animate-pulse"></span>
+                        <span id="userAgencyDisplay" class="font-bold text-slate-900"></span>
+                        <span id="userRoleBadge" class="px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-[#423A8E]/15 text-[#423A8E] border border-[#423A8E]/30"></span>
+                    </div>
+
+                    <button onclick="openAgentModal()" class="px-3 py-1.5 bg-[#423A8E] hover:bg-[#342e73] text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-users-gear text-xs"></i>
+                        <span>營業員管理</span>
+                    </button>
+
+                    <button onclick="openSecurityModal()" title="安全設定" class="p-2 text-slate-800 hover:text-black bg-slate-200 hover:bg-slate-300 rounded-xl border border-slate-300 transition">
+                        <i class="fa-solid fa-shield-halved text-xs"></i>
+                    </button>
+
+                    <button onclick="handleLogout()" title="登出" class="p-2 text-[#DC3545] hover:bg-rose-100 border border-rose-300 rounded-xl transition">
+                        <i class="fa-solid fa-right-from-bracket text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+        <!-- LOGIN SECTION -->
+        <section id="loginSection" class="max-w-md mx-auto pt-10">
+            <div class="bg-white border border-slate-300 rounded-3xl p-8 shadow-xl space-y-6">
+                <div class="text-center space-y-2">
+                    <div class="inline-flex p-3 rounded-2xl bg-[#423A8E]/15 border border-[#423A8E]/30 text-[#423A8E] mb-2">
+                        <i class="fa-solid fa-lock text-2xl"></i>
+                    </div>
+                    <h2 class="text-2xl font-black text-slate-950 tracking-tight">Macau District 上板系統</h2>
+                    <p class="text-xs font-semibold text-slate-700">請選擇登入身份並輸入授權密碼</p>
+                </div>
+
+                <form onsubmit="handleLogin(event)" class="space-y-4">
+                    <!-- LOGIN TYPE SELECTOR -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">登入身份</label>
+                        <select id="loginType" onchange="toggleLoginType()" class="w-full px-4 py-3 bg-slate-100 border border-slate-400 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#423A8E] focus:border-[#423A8E] transition">
+                            <option value="AGENCY">Agency 團隊登入</option>
+                            <option value="ADMIN">Master Admin 管理員</option>
+                        </select>
+                    </div>
+
+                    <!-- AGENCY SELECTOR -->
+                    <div id="loginAgencyGroup">
+                        <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">選擇 Agency</label>
+                        <select id="loginAgencySelect" class="w-full px-4 py-3 bg-slate-100 border border-slate-400 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#423A8E] focus:border-[#423A8E] transition"></select>
+                    </div>
+
+                    <!-- PASSWORD -->
+                    <div>
+                        <label class="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">授權密碼</label>
+                        <input id="loginPassword" type="password" required placeholder="請輸入密碼" class="w-full px-4 py-3 bg-slate-100 border border-slate-400 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#423A8E] focus:border-[#423A8E] transition">
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 bg-gradient-to-r from-[#423A8E] via-[#342e73] to-[#00CCCD] text-white font-extrabold rounded-xl text-sm shadow-md shadow-[#423A8E]/30 hover:opacity-95 transition transform active:scale-[0.99]">
+                        進入業績系統
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- APP DASHBOARD SECTION -->
+        <section id="appSection" class="hidden space-y-8">
+
+            <!-- STATS CARDS GRID -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- CARD 1: CASES -->
+                <div class="bg-white border border-slate-300 rounded-2xl p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-extrabold text-slate-700 uppercase tracking-wider whitespace-nowrap">總保單宗數</span>
+                        <div class="p-2 rounded-xl bg-[#423A8E]/15 text-[#423A8E] border border-[#423A8E]/30"><i class="fa-solid fa-file-contract text-sm"></i></div>
+                    </div>
+                    <div class="flex items-baseline space-x-2">
+                        <span id="statTotalCases" class="text-2xl font-black text-slate-950">0</span>
+                        <span class="text-xs text-slate-700 font-bold">宗</span>
+                    </div>
+                </div>
+
+                <!-- CARD 2: FYC -->
+                <div class="bg-white border border-slate-300 rounded-2xl p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-extrabold text-slate-700 uppercase tracking-wider whitespace-nowrap">到手總佣金 FYC (USD × 7.8)</span>
+                        <div class="p-2 rounded-xl bg-[#198754]/15 text-[#198754] border border-[#198754]/30"><i class="fa-solid fa-sack-dollar text-sm"></i></div>
+                    </div>
+                    <div class="flex items-baseline space-x-1">
+                        <span class="text-xs text-[#198754] font-black">$</span>
+                        <span id="statTotalFYC" class="text-2xl font-black text-slate-950">0.00</span>
+                    </div>
+                </div>
+
+                <!-- CARD 3: FYP -->
+                <div class="bg-white border border-slate-300 rounded-2xl p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-xs font-extrabold text-slate-700 uppercase tracking-wider whitespace-nowrap">到手總保費 FYP (USD × 7.8)</span>
+                        <div class="p-2 rounded-xl bg-[#0D6EFD]/15 text-[#0D6EFD] border border-[#0D6EFD]/30"><i class="fa-solid fa-piggy-bank text-sm"></i></div>
+                    </div>
+                    <div class="flex items-baseline space-x-1">
+                        <span class="text-xs text-[#0D6EFD] font-black">$</span>
+                        <span id="statTotalFYP" class="text-2xl font-black text-slate-950">0.00</span>
+                    </div>
+                </div>
+
+                <!-- CARD 4: DYNAMIC ACTIVE AGENTS / ACTIVE AGENCY -->
+                <div class="bg-white border border-slate-300 rounded-2xl p-5 shadow-sm relative overflow-hidden group hover:shadow-md transition">
+                    <div class="flex items-center justify-between mb-3">
+                        <span id="statCard4Title" class="text-xs font-extrabold text-slate-700 uppercase tracking-wider whitespace-nowrap">Active Agent</span>
+                        <div class="p-2 rounded-xl bg-[#00CCCD]/20 text-[#006667] border border-[#00CCCD]/40"><i id="statCard4Icon" class="fa-solid fa-user-check text-sm"></i></div>
+                    </div>
+                    <div class="flex items-baseline space-x-2">
+                        <span id="statCard4Value" class="text-2xl font-black text-slate-950">0</span>
+                        <span id="statCard4Unit" class="text-xs text-slate-700 font-bold">人</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CONTROLS & FILTER BAR -->
+            <div class="bg-white border border-slate-300 rounded-2xl p-4 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
+                    <!-- MONTH FILTER -->
+                    <input id="monthFilter" type="month" onchange="renderDashboard()" class="px-3.5 py-2 bg-slate-100 border border-slate-400 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#423A8E]">
+
+                    <!-- AGENCY FILTER (ADMIN ONLY) -->
+                    <select id="agencyFilter" onchange="renderDashboard()" class="px-3.5 py-2 bg-slate-100 border border-slate-400 rounded-xl text-xs font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#423A8E] hidden"></select>
+
+                    <!-- SEARCH BAR -->
+                    <div class="relative flex-1 sm:w-64">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-600"></i>
+                        <input id="searchQuery" type="text" oninput="renderDashboard()" placeholder="搜尋保單號碼/客戶/營業員..." class="w-full pl-9 pr-3.5 py-2 bg-slate-100 border border-slate-400 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#423A8E]">
+                    </div>
+                </div>
+
+                <!-- ACTION BUTTONS -->
+                <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
+                    <button id="adminManageAgenciesBtn" onclick="openAgencyManagementModal()" class="hidden px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-900 border border-slate-400 rounded-xl text-xs font-bold transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-sitemap"></i>
+                        <span>管理 Agency 列表</span>
+                    </button>
+
+                    <button onclick="exportCSV()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-900 border border-slate-400 rounded-xl text-xs font-bold transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-file-csv text-xs text-[#198754]"></i>
+                        <span>匯出 Excel / CSV</span>
+                    </button>
+
+                    <button onclick="openNewPolicyModal()" class="px-4 py-2 bg-gradient-to-r from-[#423A8E] to-[#00CCCD] hover:opacity-95 text-white rounded-xl text-xs font-extrabold shadow-md shadow-[#423A8E]/20 transition flex items-center space-x-1.5">
+                        <i class="fa-solid fa-plus text-xs"></i>
+                        <span>新增保單登記</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- MONTHLY COMPARISON PANEL -->
+            <div class="bg-white border border-slate-300 rounded-2xl p-6 shadow-sm space-y-4">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div>
+                        <h3 class="text-base font-black text-slate-950 flex items-center space-x-2">
+                            <i class="fa-solid fa-chart-column text-[#423A8E]"></i>
+                            <span>月度數據對比分析 (保單宗數 & 到手佣金 FYC)</span>
+                        </h3>
+                        <p class="text-xs font-semibold text-slate-700">跨月份業績走勢分析（最多顯示 12 個月）</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <select id="monthlyCompRange" onchange="renderMonthlyComparison()" class="px-3 py-1.5 bg-slate-100 border border-slate-400 rounded-xl text-xs font-bold text-slate-900 focus:outline-none">
+                            <option value="3">近 3 個月</option>
+                            <option value="6" selected>近 6 個月</option>
+                            <option value="12">近 12 個月</option>
+                        </select>
+                        <button onclick="exportMonthlyComparisonCSV()" class="px-3 py-1.5 bg-[#423A8E]/15 hover:bg-[#423A8E]/25 text-[#423A8E] border border-[#423A8E]/30 rounded-xl text-xs font-bold transition flex items-center space-x-1">
+                            <i class="fa-solid fa-download text-xs"></i>
+                            <span>匯出月度報告</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-200 text-slate-900 uppercase font-black border-b border-slate-300">
+                            <tr>
+                                <th class="px-4 py-3">月份</th>
+                                <th class="px-4 py-3">保單宗數</th>
+                                <th class="px-4 py-3">成功出單</th>
+                                <th class="px-4 py-3">核保中</th>
+                                <th class="px-4 py-3">到手總佣金 FYC</th>
+                                <th class="px-4 py-3">到手總保費 FYP</th>
+                                <th class="px-4 py-3">Active Agents</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monthlyCompTableBody" class="divide-y divide-slate-200 font-semibold text-slate-900"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- POLICIES RECORDS TABLE -->
+            <div class="bg-white border border-slate-300 rounded-2xl shadow-sm overflow-hidden">
+                <div class="px-6 py-4 border-b border-slate-300 flex items-center justify-between">
+                    <h3 class="text-base font-black text-slate-950 flex items-center space-x-2">
+                        <i class="fa-solid fa-list-check text-[#006667]"></i>
+                        <span>新造保單明細紀錄</span>
+                    </h3>
+                    <span id="recordsCountBadge" class="text-xs px-2.5 py-1 bg-slate-200 text-slate-900 font-black rounded-lg border border-slate-300"></span>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-200 text-slate-900 uppercase font-black border-b border-slate-300">
+                            <tr>
+                                <th class="px-4 py-3.5">登記日期/時段</th>
+                                <th class="px-4 py-3.5">Agency</th>
+                                <th class="px-4 py-3.5">營業員姓名</th>
+                                <th class="px-4 py-3.5">保單號碼</th>
+                                <th class="px-4 py-3.5">客戶姓名</th>
+                                <th class="px-4 py-3.5">保單計劃</th>
+                                <th class="px-4 py-3.5">FYC (USD × 7.8)</th>
+                                <th class="px-4 py-3.5">FYP (USD × 7.8)</th>
+                                <th class="px-4 py-3.5">保單狀態</th>
+                                <th class="px-4 py-3.5">出單日期</th>
+                                <th class="px-4 py-3.5 text-right">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="policyTableBody" class="divide-y divide-slate-200 text-slate-900 font-semibold"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- AGENT MANAGEMENT MODAL -->
+    <div id="agentModal" class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-xs hidden flex items-start justify-center pt-10 sm:pt-16 p-4 overflow-y-auto">
+        <div class="bg-white border border-slate-200 max-w-lg w-full rounded-2xl shadow-xl p-6 space-y-4 my-auto sm:my-0">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <h3 class="text-base font-bold text-slate-900">營業員名冊管理</h3>
+                <button onclick="closeAgentModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <!-- Add Agent Form -->
+            <form onsubmit="handleAddNewAgent(event)" class="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-3">
+                <h4 class="text-xs font-bold text-slate-500 uppercase">新增營業員 (需同時填寫姓名與編號)</h4>
+                <div class="grid grid-cols-2 gap-2">
+                    <input id="newAgentName" type="text" placeholder="營業員姓名" required class="px-3 py-2 border border-slate-300 rounded-xl text-xs bg-white text-slate-800">
+                    <input id="newAgentCode" type="text" placeholder="營業員編號" required class="px-3 py-2 border border-slate-300 rounded-xl text-xs bg-white text-slate-800">
+                </div>
+                <div id="agentAgencySelectWrapper" class="hidden">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">所屬 Agency</label>
+                    <select id="newAgentAgencySelect" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs bg-white text-slate-800"></select>
+                </div>
+                <button type="submit" class="w-full py-2 bg-[#423A8E] hover:bg-[#342e73] text-white text-xs font-semibold rounded-xl transition">確認新增營業員</button>
+            </form>
+
+            <!-- Active Agents List -->
+            <div class="max-h-60 overflow-y-auto">
+                <h4 class="text-xs font-bold text-slate-500 uppercase mb-2">現有營業員名單</h4>
+                <ul id="agentsList" class="divide-y divide-slate-100 text-xs"></ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- POP-UP WARNING MODAL -->
+    <div id="warningModal" class="fixed inset-0 z-[110] bg-slate-900/40 backdrop-blur-xs hidden flex items-start justify-center pt-10 sm:pt-16 p-4">
+        <div class="bg-white border border-slate-200 max-w-sm w-full rounded-2xl shadow-xl p-6 text-center space-y-4">
+            <div class="inline-flex p-3 rounded-full bg-[#FFC107]/20 text-[#D39E00] border border-[#FFC107]/40">
+                <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-900">系統提示</h3>
+            <p id="warningModalText" class="text-xs text-slate-600 leading-relaxed"></p>
+            <button onclick="closeWarningModal()" class="w-full py-2.5 bg-[#423A8E] hover:bg-[#342e73] text-white text-xs font-semibold rounded-xl transition">明白並修正</button>
+        </div>
+    </div>
+
+    <!-- NEW POLICY MODAL -->
+    <div id="policyModal" class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-xs hidden flex items-start justify-center pt-8 sm:pt-12 p-4 overflow-y-auto">
+        <div class="bg-white border border-slate-200 max-w-xl w-full rounded-2xl shadow-xl p-6 space-y-4 my-auto">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <h3 id="policyModalTitle" class="text-base font-bold text-slate-900">新增保單登記</h3>
+                <button onclick="closePolicyModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form id="policyForm" onsubmit="savePolicy(event)" class="space-y-4">
+                <input type="hidden" id="policyId">
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">登記日期</label>
+                        <input id="inputSignedDate" type="date" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">登記時段</label>
+                        <select id="inputPeriod" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800">
+                            <option value="AM">上午 (AM)</option>
+                            <option value="PM">下午 (PM)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">Agency</label>
+                        <select id="inputAgencySelect" onchange="populateModalAgents()" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800"></select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">營業員姓名</label>
+                        <select id="inputAgentSelect" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800"></select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">保單號碼 (需恰好 10 位英數組合)</label>
+                        <input id="inputPolicyNumber" type="text" maxlength="10" placeholder="例: P123456789" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800 uppercase font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">客戶姓名</label>
+                        <input id="inputClientName" type="text" placeholder="客戶全名" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 mb-1">保單計劃</label>
+                    <select id="inputProductTypeSelect" onchange="toggleCustomProductInput()" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800 mb-2">
+                        <option value="人壽保障 (Life)">人壽保障 (Life)</option>
+                        <option value="醫療儲蓄 (Health & Savings)">醫療儲蓄 (Health & Savings)</option>
+                        <option value="危疾保障 (Critical Illness)">危疾保障 (Critical Illness)</option>
+                        <option value="投資相連 (Investment)">投資相連 (Investment)</option>
+                        <option value="商業保險 (Commercial)">商業保險 (Commercial)</option>
+                        <option value="OTHER">其他保單計劃 (自訂)</option>
+                    </select>
+                    <input id="inputCustomProduct" type="text" placeholder="請輸入自訂保單計劃名稱" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800 hidden">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">到手佣金 FYC (USD × 7.8)</label>
+                        <input id="inputFYC" type="number" step="0.01" min="0" placeholder="0.00" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">到手保費 FYP (USD × 7.8)</label>
+                        <input id="inputFYP" type="number" step="0.01" min="0" placeholder="0.00" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">保單狀態</label>
+                        <select id="inputStatus" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800">
+                            <option value="PENDING">核保處理中 (Pending)</option>
+                            <option value="ISSUED">成功出單 (Successfully Issued)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 mb-1">出單日期 (若已出單)</label>
+                        <input id="inputIssuedDate" type="date" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800">
+                    </div>
+                </div>
+
+                <div class="pt-2 flex items-center justify-end space-x-3">
+                    <button type="button" onclick="closePolicyModal()" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-xl text-xs font-semibold hover:bg-slate-200 transition">取消</button>
+                    <button type="submit" class="px-5 py-2 bg-[#423A8E] hover:bg-[#342e73] text-white rounded-xl text-xs font-bold transition">儲存保單紀錄</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SECURITY MODAL -->
+    <div id="securityModal" class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-xs hidden flex items-start justify-center pt-10 sm:pt-16 p-4">
+        <div class="bg-white border border-slate-200 max-w-md w-full rounded-2xl shadow-xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <h3 class="text-base font-bold text-slate-900 flex items-center space-x-2">
+                    <i class="fa-solid fa-shield-halved text-[#423A8E]"></i>
+                    <span>安全與密碼變更</span>
+                </h3>
+                <button onclick="closeSecurityModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form onsubmit="handleUpdatePasswords(event)" class="space-y-4">
+                <div id="adminPasswordGroup">
+                    <label class="block text-xs font-bold text-slate-500 mb-1">變更 Admin 密碼</label>
+                    <input id="newAdminPassword" type="password" placeholder="輸入新 Admin 密碼" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800 mb-2">
+                    <input id="confirmAdminPassword" type="password" placeholder="再次確認新 Admin 密碼" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800">
+                </div>
+
+                <div id="teamPasswordGroup" class="pt-2 border-t border-slate-200">
+                    <label class="block text-xs font-bold text-slate-500 mb-1">變更 Agency 授權密碼</label>
+                    <input id="newTeamPassword" type="password" placeholder="輸入新 Agency 密碼" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800 mb-2">
+                    <input id="confirmTeamPassword" type="password" placeholder="再次確認新 Agency 密碼" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800">
+                </div>
+
+                <button type="submit" class="w-full py-2.5 bg-[#423A8E] hover:bg-[#342e73] text-white font-bold text-xs rounded-xl transition">確認更新密碼</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- AGENCY MANAGEMENT MODAL -->
+    <div id="agencyManagementModal" class="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-xs hidden flex items-start justify-center pt-10 sm:pt-16 p-4">
+        <div class="bg-white border border-slate-200 max-w-md w-full rounded-2xl shadow-xl p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <h3 class="text-base font-bold text-slate-900">Agency 列表管理</h3>
+                <button onclick="closeAgencyManagementModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+
+            <form onsubmit="handleAddAgency(event)" class="flex gap-2">
+                <input id="newAgencyInput" type="text" placeholder="新 Agency 名稱" required class="flex-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-800">
+                <button type="submit" class="px-4 py-2 bg-[#423A8E] hover:bg-[#342e73] text-white rounded-xl text-xs font-bold">新增</button>
+            </form>
+
+            <ul id="agencyManageList" class="divide-y divide-slate-100 max-h-60 overflow-y-auto text-xs"></ul>
+        </div>
+    </div>
+
+    <!-- MAIN JAVASCRIPT APP LOGIC -->
+    <script>
+        // GLOBAL APPLICATION STATE
+        let state = {
+            agencies: ['Agency Alpha', 'Agency Bravo', 'Agency Charlie', 'Agency Delta', 'Agency Echo'],
+            agents: [
+                { id: '1', name: '陳大文', code: 'A101', agency: 'Agency Alpha' },
+                { id: '2', name: '張小明', code: 'B202', agency: 'Agency Bravo' }
+            ],
+            policies: [
+                {
+                    id: '101',
+                    signedDate: '2026-10-15',
+                    period: 'AM',
+                    agency: 'Agency Alpha',
+                    agentName: '陳大文',
+                    policyNumber: 'P123456789',
+                    clientName: '黃先生',
+                    productType: '人壽保障 (Life)',
+                    fyc: 5000,
+                    fyp: 12000,
+                    status: 'ISSUED',
+                    issuedDate: '2026-10-20'
+                }
+            ],
+            passwords: {
+                admin: 'admin2026',
+                team: 'team2026'
+            }
+        };
+
+        let currentUser = { isLoggedIn: false, role: null, agency: null };
+
+        // INITIALIZATION
+        window.onload = function() {
+            const saved = localStorage.getItem('master_tracker_data');
+            if (saved) {
+                try { state = JSON.parse(saved); } catch(e){}
+            }
+
+            setCurrentMonthFilter();
+            initLoginDropdowns();
+        };
+
+        function saveData() {
+            try {
+                localStorage.setItem('master_tracker_data', JSON.stringify(state));
+            } catch(e) { console.error(e); }
+        }
+
+        function setCurrentMonthFilter() {
+            const now = new Date();
+            const ym = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            const filter = document.getElementById('monthFilter');
+            if (filter && !filter.value) filter.value = ym;
+        }
+
+        function initLoginDropdowns() {
+            const loginSel = document.getElementById('loginAgencySelect');
+            if (loginSel) {
+                loginSel.innerHTML = state.agencies.map(a => `<option value="${a}">${a}</option>`).join('');
+            }
+            const filterSel = document.getElementById('agencyFilter');
+            if (filterSel) {
+                const cur = filterSel.value;
+                filterSel.innerHTML = `<option value="ALL">所有 Agency</option>` + state.agencies.map(a => `<option value="${a}">${a}</option>`).join('');
+                if (cur) filterSel.value = cur;
+            }
+        }
+
+        function showWarningModal(msg) {
+            const txt = document.getElementById('warningModalText');
+            if (txt) txt.innerText = msg;
+            document.getElementById('warningModal').classList.remove('hidden');
+        }
+
+        function closeWarningModal() {
+            document.getElementById('warningModal').classList.add('hidden');
+        }
+
+        function toggleLoginType() {
+            const type = document.getElementById('loginType').value;
+            document.getElementById('loginAgencyGroup').style.display = type === 'AGENCY' ? 'block' : 'none';
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const type = document.getElementById('loginType').value;
+            const pwd = document.getElementById('loginPassword').value;
+
+            if (type === 'ADMIN') {
+                if (pwd === state.passwords.admin) {
+                    currentUser = { isLoggedIn: true, role: 'ADMIN', agency: 'ALL' };
+                } else {
+                    showWarningModal('Master Admin 密碼不正確！');
+                    return;
+                }
+            } else {
+                if (pwd === state.passwords.team) {
+                    const selAgency = document.getElementById('loginAgencySelect').value;
+                    currentUser = { isLoggedIn: true, role: 'AGENCY', agency: selAgency };
+                } else {
+                    showWarningModal('Agency 授權密碼不正確！');
+                    return;
+                }
+            }
+
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('appSection').classList.remove('hidden');
+            document.getElementById('userNavControls').classList.remove('hidden');
+
+            document.getElementById('userAgencyDisplay').innerText = currentUser.agency === 'ALL' ? 'Master Admin' : currentUser.agency;
+            document.getElementById('userRoleBadge').innerText = currentUser.role;
+
+            const agencyFilter = document.getElementById('agencyFilter');
+            const adminAgenciesBtn = document.getElementById('adminManageAgenciesBtn');
+            if (currentUser.role === 'ADMIN') {
+                agencyFilter.classList.remove('hidden');
+                adminAgenciesBtn.classList.remove('hidden');
+            } else {
+                agencyFilter.classList.add('hidden');
+                adminAgenciesBtn.classList.add('hidden');
+            }
+
+            renderDashboard();
+        }
+
+        function handleLogout() {
+            currentUser = { isLoggedIn: false, role: null, agency: null };
+            document.getElementById('appSection').classList.add('hidden');
+            document.getElementById('userNavControls').classList.add('hidden');
+            document.getElementById('loginSection').classList.remove('hidden');
+            document.getElementById('loginPassword').value = '';
+        }
+
+        // RENDER DASHBOARD & METRICS
+        function renderDashboard() {
+            const monthVal = document.getElementById('monthFilter').value;
+            const agencyVal = currentUser.role === 'ADMIN' ? document.getElementById('agencyFilter').value : currentUser.agency;
+            const query = document.getElementById('searchQuery').value.trim().toLowerCase();
+
+            let filtered = state.policies.filter(p => {
+                const matchMonth = !monthVal || p.signedDate.startsWith(monthVal);
+                const matchAgency = agencyVal === 'ALL' || p.agency === agencyVal;
+                const matchQuery = !query || 
+                    p.policyNumber.toLowerCase().includes(query) ||
+                    p.clientName.toLowerCase().includes(query) ||
+                    p.agentName.toLowerCase().includes(query) ||
+                    p.productType.toLowerCase().includes(query) ||
+                    p.agency.toLowerCase().includes(query);
+
+                return matchMonth && matchAgency && matchQuery;
+            });
+
+            // Calculate Metrics
+            const totalCases = filtered.length;
+            const totalFYC = filtered.reduce((acc, curr) => acc + (parseFloat(curr.fyc) || 0), 0);
+            const totalFYP = filtered.reduce((acc, curr) => acc + (parseFloat(curr.fyp) || 0), 0);
+
+            document.getElementById('statTotalCases').innerText = totalCases;
+            document.getElementById('statTotalFYC').innerText = (totalFYC * 7.8).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            document.getElementById('statTotalFYP').innerText = (totalFYP * 7.8).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            // Card 4 Logic: Active Agency for Admin vs Active Agent for Agency
+            const card4Title = document.getElementById('statCard4Title');
+            const card4Icon = document.getElementById('statCard4Icon');
+            const card4Val = document.getElementById('statCard4Value');
+            const card4Unit = document.getElementById('statCard4Unit');
+
+            if (currentUser.role === 'ADMIN' && agencyVal === 'ALL') {
+                card4Title.innerText = 'Active Agency';
+                card4Icon.className = 'fa-solid fa-sitemap text-sm';
+                const activeAgencies = new Set(filtered.map(p => p.agency)).size;
+                card4Val.innerText = activeAgencies;
+                card4Unit.innerText = '個';
+            } else {
+                card4Title.innerText = 'Active Agent';
+                card4Icon.className = 'fa-solid fa-user-check text-sm';
+                const activeAgents = new Set(filtered.map(p => p.agentName)).size;
+                card4Val.innerText = activeAgents;
+                card4Unit.innerText = '人';
+            }
+
+            document.getElementById('recordsCountBadge').innerText = `共 ${filtered.length} 筆紀錄`;
+
+            // Render Table
+            const tbody = document.getElementById('policyTableBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="11" class="px-4 py-8 text-center text-slate-500 font-bold">暫無符合條件之保單紀錄</td></tr>`;
+            } else {
+                tbody.innerHTML = filtered.map(p => {
+                    const foundAgent = state.agents.find(a => a.name === p.agentName && a.agency === p.agency);
+                    const agentCodeDisplay = foundAgent && foundAgent.code ? ` <span class="font-mono text-[11px] font-bold text-slate-700">[${foundAgent.code}]</span>` : '';
+                    
+                    return `
+                    <tr class="hover:bg-slate-100 transition">
+                        <td class="px-4 py-3 font-mono font-bold text-slate-900">${p.signedDate} <span class="text-[10px] px-1.5 py-0.5 rounded bg-slate-200 border border-slate-300 text-slate-900 font-bold ml-1">${p.period || 'AM'}</span></td>
+                        <td class="px-4 py-3 font-extrabold text-slate-950">${p.agency}</td>
+                        <td class="px-4 py-3 text-[#423A8E] font-black">${p.agentName}${agentCodeDisplay}</td>
+                        <td class="px-4 py-3 font-mono text-[#0D6EFD] font-black">${p.policyNumber}</td>
+                        <td class="px-4 py-3 font-bold text-slate-950">${p.clientName}</td>
+                        <td class="px-4 py-3 font-semibold text-slate-800">${p.productType}</td>
+                        <td class="px-4 py-3 text-[#198754] font-black">$${((parseFloat(p.fyc) || 0) * 7.8).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                        <td class="px-4 py-3 text-[#0D6EFD] font-black">$${((parseFloat(p.fyp) || 0) * 7.8).toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-0.5 text-[10px] font-black rounded-md ${p.status === 'ISSUED' ? 'bg-[#198754]/20 text-[#12633d] border border-[#198754]/40' : 'bg-[#FFC107]/30 text-[#8B6B00] border border-[#FFC107]/50'}">
+                                ${p.status === 'ISSUED' ? '成功出單' : '核保中'}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 font-mono font-bold text-slate-700">${p.issuedDate || '-'}</td>
+                        <td class="px-4 py-3 text-right">
+                            <div class="flex items-center justify-end space-x-1">
+                                <button onclick="editPolicy('${p.id}')" class="p-1.5 text-slate-600 hover:text-[#423A8E] transition" title="編輯">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </button>
+                                <button onclick="deletePolicy('${p.id}')" class="p-1.5 text-slate-600 hover:text-[#DC3545] transition" title="刪除">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `}).join('');
+            }
+
+            renderMonthlyComparison();
+        }
+
+        // MONTHLY COMPARISON ANALYTICS
+        function renderMonthlyComparison() {
+            const range = parseInt(document.getElementById('monthlyCompRange').value) || 6;
+            const agencyVal = currentUser.role === 'ADMIN' ? document.getElementById('agencyFilter').value : currentUser.agency;
+
+            const now = new Date();
+            const monthKeys = [];
+            for (let i = range - 1; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const ym = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+                monthKeys.push(ym);
+            }
+
+            const tbody = document.getElementById('monthlyCompTableBody');
+            if (!tbody) return;
+
+            tbody.innerHTML = monthKeys.map(ym => {
+                const monthPolicies = state.policies.filter(p => {
+                    const matchMonth = p.signedDate.startsWith(ym);
+                    const matchAgency = agencyVal === 'ALL' || p.agency === agencyVal;
+                    return matchMonth && matchAgency;
+                });
+
+                const totalCases = monthPolicies.length;
+                const issuedCases = monthPolicies.filter(p => p.status === 'ISSUED').length;
+                const pendingCases = monthPolicies.filter(p => p.status === 'PENDING').length;
+                const totalFYC = monthPolicies.reduce((acc, curr) => acc + (parseFloat(curr.fyc) || 0), 0) * 7.8;
+                const totalFYP = monthPolicies.reduce((acc, curr) => acc + (parseFloat(curr.fyp) || 0), 0) * 7.8;
+                const activeAgents = new Set(monthPolicies.map(p => p.agentName)).size;
+
+                return `
+                    <tr class="hover:bg-slate-100 transition">
+                        <td class="px-4 py-3 font-mono font-black text-slate-950">${ym}</td>
+                        <td class="px-4 py-3 font-black text-[#423A8E]">${totalCases} 宗</td>
+                        <td class="px-4 py-3 text-[#198754] font-bold">${issuedCases} 宗</td>
+                        <td class="px-4 py-3 text-[#8B6B00] font-bold">${pendingCases} 宗</td>
+                        <td class="px-4 py-3 font-black text-[#198754]">$${totalFYC.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                        <td class="px-4 py-3 font-black text-[#0D6EFD]">$${totalFYP.toLocaleString('en-US', { minimumFractionDigits: 2 })}</td>
+                        <td class="px-4 py-3 font-black text-slate-900">${activeAgents} 人</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // EXPORT MONTHLY COMPARISON CSV
+        function exportMonthlyComparisonCSV() {
+            const range = parseInt(document.getElementById('monthlyCompRange').value) || 6;
+            const agencyVal = currentUser.role === 'ADMIN' ? document.getElementById('agencyFilter').value : currentUser.agency;
+
+            const now = new Date();
+            const monthKeys = [];
+            for (let i = range - 1; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                monthKeys.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+            }
+
+            let csv = '\uFEFF月份,保單宗數,成功出單宗數,核保中宗數,到手總佣金 FYC (HKD),到手總保費 FYP (HKD),Active Agents 人數\n';
+
+            monthKeys.forEach(ym => {
+                const monthPolicies = state.policies.filter(p => {
+                    const matchMonth = p.signedDate.startsWith(ym);
+                    const matchAgency = agencyVal === 'ALL' || p.agency === agencyVal;
+                    return matchMonth && matchAgency;
+                });
+
+                const totalCases = monthPolicies.length;
+                const issuedCases = monthPolicies.filter(p => p.status === 'ISSUED').length;
+                const pendingCases = monthPolicies.filter(p => p.status === 'PENDING').length;
+                const totalFYC = (monthPolicies.reduce((acc, curr) => acc + (parseFloat(curr.fyc) || 0), 0) * 7.8).toFixed(2);
+                const totalFYP = (monthPolicies.reduce((acc, curr) => acc + (parseFloat(curr.fyp) || 0), 0) * 7.8).toFixed(2);
+                const activeAgents = new Set(monthPolicies.map(p => p.agentName)).size;
+
+                csv += `"${ym}",${totalCases},${issuedCases},${pendingCases},${totalFYC},${totalFYP},${activeAgents}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute('download', `Monthly_Performance_Report_${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // POLICY MODALS & MANAGEMENT
+        function openNewPolicyModal() {
+            document.getElementById('policyModalTitle').innerText = '新增保單登記';
+            document.getElementById('policyId').value = '';
+            document.getElementById('policyForm').reset();
+            
+            const today = new Date().toISOString().slice(0, 10);
+            document.getElementById('inputSignedDate').value = today;
+
+            populateModalAgencies();
+            document.getElementById('policyModal').classList.remove('hidden');
+        }
+
+        function populateModalAgencies() {
+            const agencySel = document.getElementById('inputAgencySelect');
+            agencySel.innerHTML = state.agencies.map(a => `<option value="${a}">${a}</option>`).join('');
+
+            if (currentUser.role === 'AGENCY') {
+                agencySel.value = currentUser.agency;
+                agencySel.disabled = true;
+            } else {
+                agencySel.disabled = false;
+            }
+
+            populateModalAgents();
+        }
+
+        function populateModalAgents() {
+            const selAgency = document.getElementById('inputAgencySelect').value;
+            const agentSel = document.getElementById('inputAgentSelect');
+
+            const filteredAgents = state.agents.filter(a => a.agency === selAgency);
+            if (filteredAgents.length === 0) {
+                agentSel.innerHTML = `<option value="">-- 請先新增此 Agency 之營業員 --</option>`;
+            } else {
+                agentSel.innerHTML = filteredAgents.map(a => `<option value="${a.name}">${a.name} [${a.code}]</option>`).join('');
+            }
+        }
+
+        function toggleCustomProductInput() {
+            const val = document.getElementById('inputProductTypeSelect').value;
+            const customInput = document.getElementById('inputCustomProduct');
+            if (val === 'OTHER') {
+                customInput.classList.remove('hidden');
+                customInput.required = true;
+            } else {
+                customInput.classList.add('hidden');
+                customInput.required = false;
+            }
+        }
+
+        function closePolicyModal() {
+            document.getElementById('policyModal').classList.add('hidden');
+        }
+
+        function savePolicy(e) {
+            e.preventDefault();
+
+            const polNum = document.getElementById('inputPolicyNumber').value.trim();
+            if (polNum.length !== 10 || !/^[a-zA-Z0-9]+$/.test(polNum)) {
+                showWarningModal('保單號碼必須為正好 10 位英數組合！');
+                return;
+            }
+
+            const agentName = document.getElementById('inputAgentSelect').value;
+            if (!agentName) {
+                showWarningModal('請選擇有效的營業員！若清單為空，請先點擊右上角「營業員管理」新增營業員。');
+                return;
+            }
+
+            const prodSelect = document.getElementById('inputProductTypeSelect').value;
+            const productType = prodSelect === 'OTHER' ? document.getElementById('inputCustomProduct').value.trim() : prodSelect;
+
+            const editId = document.getElementById('policyId').value;
+            const policyData = {
+                id: editId || String(Date.now()),
+                signedDate: document.getElementById('inputSignedDate').value,
+                period: document.getElementById('inputPeriod').value,
+                agency: document.getElementById('inputAgencySelect').value,
+                agentName: agentName,
+                policyNumber: polNum.toUpperCase(),
+                clientName: document.getElementById('inputClientName').value.trim(),
+                productType: productType,
+                fyc: parseFloat(document.getElementById('inputFYC').value) || 0,
+                fyp: parseFloat(document.getElementById('inputFYP').value) || 0,
+                status: document.getElementById('inputStatus').value,
+                issuedDate: document.getElementById('inputIssuedDate').value || ''
+            };
+
+            if (editId) {
+                const idx = state.policies.findIndex(p => p.id === editId);
+                if (idx !== -1) state.policies[idx] = policyData;
+            } else {
+                state.policies.unshift(policyData);
+            }
+
+            saveData();
+            closePolicyModal();
+            renderDashboard();
+        }
+
+        function editPolicy(id) {
+            const p = state.policies.find(item => item.id === id);
+            if (!p) return;
+
+            openNewPolicyModal();
+            document.getElementById('policyModalTitle').innerText = '編輯保單紀錄';
+            document.getElementById('policyId').value = p.id;
+
+            document.getElementById('inputSignedDate').value = p.signedDate;
+            document.getElementById('inputPeriod').value = p.period || 'AM';
+            document.getElementById('inputAgencySelect').value = p.agency;
+            populateModalAgents();
+
+            document.getElementById('inputAgentSelect').value = p.agentName;
+            document.getElementById('inputPolicyNumber').value = p.policyNumber;
+            document.getElementById('inputClientName').value = p.clientName;
+
+            const prodSelect = document.getElementById('inputProductTypeSelect');
+            const customInput = document.getElementById('inputCustomProduct');
+
+            const standardProds = ['人壽保障 (Life)', '醫療儲蓄 (Health & Savings)', '危疾保障 (Critical Illness)', '投資相連 (Investment)', '商業保險 (Commercial)'];
+            if (standardProds.includes(p.productType)) {
+                prodSelect.value = p.productType;
+                customInput.classList.add('hidden');
+                customInput.required = false;
+            } else {
+                prodSelect.value = 'OTHER';
+                customInput.value = p.productType;
+                customInput.classList.remove('hidden');
+                customInput.required = true;
+            }
+
+            document.getElementById('inputFYC').value = p.fyc;
+            document.getElementById('inputFYP').value = p.fyp;
+            document.getElementById('inputStatus').value = p.status;
+            document.getElementById('inputIssuedDate').value = p.issuedDate || '';
+        }
+
+        function deletePolicy(id) {
+            if (confirm('確定要刪除這筆保單紀錄嗎？')) {
+                state.policies = state.policies.filter(p => p.id !== id);
+                saveData();
+                renderDashboard();
+            }
+        }
+
+        // AGENT MANAGEMENT
+        function openAgentModal() {
+            const agencyWrapper = document.getElementById('agentAgencySelectWrapper');
+            const agencySel = document.getElementById('newAgentAgencySelect');
+
+            if (currentUser.role === 'ADMIN') {
+                agencyWrapper.classList.remove('hidden');
+                agencySel.innerHTML = state.agencies.map(a => `<option value="${a}">${a}</option>`).join('');
+            } else {
+                agencyWrapper.classList.add('hidden');
+            }
+
+            renderAgentsList();
+            document.getElementById('agentModal').classList.remove('hidden');
+        }
+
+        function closeAgentModal() {
+            document.getElementById('agentModal').classList.add('hidden');
+        }
+
+        function handleAddNewAgent(e) {
+            e.preventDefault();
+            const name = document.getElementById('newAgentName').value.trim();
+            const code = document.getElementById('newAgentCode').value.trim();
+            const targetAgency = currentUser.role === 'ADMIN' ? document.getElementById('newAgentAgencySelect').value : currentUser.agency;
+
+            if (!name || !code) {
+                showWarningModal('請同時輸入營業員姓名與編號！');
+                return;
+            }
+
+            state.agents.push({
+                id: String(Date.now()),
+                name: name,
+                code: code,
+                agency: targetAgency
+            });
+
+            saveData();
+            document.getElementById('newAgentName').value = '';
+            document.getElementById('newAgentCode').value = '';
+
+            renderAgentsList();
+            renderDashboard();
+        }
+
+        function removeAgent(id) {
+            if (confirm('確定要刪除此營業員嗎？')) {
+                state.agents = state.agents.filter(a => a.id !== id);
+                saveData();
+                renderAgentsList();
+                renderDashboard();
+            }
+        }
+
+        function renderAgentsList() {
+            const list = document.getElementById('agentsList');
+            const targetAgency = currentUser.role === 'ADMIN' ? 'ALL' : currentUser.agency;
+
+            const filtered = state.agents.filter(a => targetAgency === 'ALL' || a.agency === targetAgency);
+
+            if (filtered.length === 0) {
+                list.innerHTML = `<li class="py-3 text-center text-slate-400">目前尚無營業員紀錄</li>`;
+            } else {
+                list.innerHTML = filtered.map(a => `
+                    <li class="py-2.5 flex items-center justify-between">
+                        <div>
+                            <span class="font-bold text-slate-800">${a.name}</span>
+                            <span class="font-mono text-xs text-[#423A8E] bg-[#423A8E]/10 px-1.5 py-0.5 rounded ml-1">[${a.code}]</span>
+                            <span class="text-[10px] text-slate-400 block">${a.agency}</span>
+                        </div>
+                        <button onclick="removeAgent('${a.id}')" class="text-[#DC3545] hover:opacity-80 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                    </li>
+                `).join('');
+            }
+        }
+
+        // SECURITY & MODALS
+        function openSecurityModal() {
+            const adminGrp = document.getElementById('adminPasswordGroup');
+            if (currentUser.role === 'ADMIN') {
+                adminGrp.classList.remove('hidden');
+            } else {
+                adminGrp.classList.add('hidden');
+            }
+            document.getElementById('securityModal').classList.remove('hidden');
+        }
+
+        function closeSecurityModal() {
+            document.getElementById('securityModal').classList.add('hidden');
+        }
+
+        function handleUpdatePasswords(e) {
+            e.preventDefault();
+            const newAdmin = document.getElementById('newAdminPassword').value.trim();
+            const confirmAdmin = document.getElementById('confirmAdminPassword').value.trim();
+            const newTeam = document.getElementById('newTeamPassword').value.trim();
+            const confirmTeam = document.getElementById('confirmTeamPassword').value.trim();
+
+            if (currentUser.role === 'ADMIN' && newAdmin) {
+                if (newAdmin !== confirmAdmin) {
+                    showWarningModal('兩次輸入的新 Admin 密碼不一致！');
+                    return;
+                }
+                state.passwords.admin = newAdmin;
+            }
+
+            if (newTeam) {
+                if (newTeam !== confirmTeam) {
+                    showWarningModal('兩次輸入的新 Agency 授權密碼不一致！');
+                    return;
+                }
+                state.passwords.team = newTeam;
+            }
+
+            saveData();
+            closeSecurityModal();
+            showWarningModal('密碼已成功更新！');
+        }
+
+        // AGENCY MANAGEMENT (ADMIN)
+        function openAgencyManagementModal() {
+            renderAgencyList();
+            document.getElementById('agencyManagementModal').classList.remove('hidden');
+        }
+
+        function closeAgencyManagementModal() {
+            document.getElementById('agencyManagementModal').classList.add('hidden');
+        }
+
+        function handleAddAgency(e) {
+            e.preventDefault();
+            const val = document.getElementById('newAgencyInput').value.trim();
+            if (val && !state.agencies.includes(val)) {
+                state.agencies.push(val);
+                saveData();
+                initLoginDropdowns();
+                renderAgencyList();
+                document.getElementById('newAgencyInput').value = '';
+            }
+        }
+
+        function removeAgency(agencyName) {
+            if (confirm(`確定要刪除 ${agencyName} 嗎？`)) {
+                state.agencies = state.agencies.filter(a => a !== agencyName);
+                saveData();
+                initLoginDropdowns();
+                renderAgencyList();
+            }
+        }
+
+        function renderAgencyList() {
+            const list = document.getElementById('agencyManageList');
+            list.innerHTML = state.agencies.map(a => `
+                <li class="py-2 flex items-center justify-between">
+                    <span class="font-bold text-slate-800">${a}</span>
+                    <button onclick="removeAgency('${a}')" class="text-rose-500 hover:text-rose-700 p-1"><i class="fa-solid fa-trash-can"></i></button>
+                </li>
+            `).join('');
+        }
+
+        // CSV EXPORT
+        function exportCSV() {
+            let csv = '\uFEFF登記日期,登記時段,Agency,營業員姓名,保單號碼,客戶姓名,保單計劃,FYC_USD,FYC_HKD,FYP_USD,FYP_HKD,保單狀態,出單日期\n';
+
+            state.policies.forEach(p => {
+                const fycHKD = ((parseFloat(p.fyc) || 0) * 7.8).toFixed(2);
+                const fypHKD = ((parseFloat(p.fyp) || 0) * 7.8).toFixed(2);
+                const statusStr = p.status === 'ISSUED' ? '成功出單' : '核保中';
+
+                csv += `"${p.signedDate}","${p.period || 'AM'}","${p.agency}","${p.agentName}","${p.policyNumber}","${p.clientName}","${p.productType}",${p.fyc},${fycHKD},${p.fyp},${fypHKD},"${statusStr}","${p.issuedDate || ''}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute('download', `New_Business_Policies_${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>
